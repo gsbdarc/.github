@@ -1,0 +1,158 @@
+# PROPOSED topic assignment for every repository in the gsbdarc organization.
+#
+# STATUS: proposed, not adopted. Nothing here has been applied to any repo.
+# Vocabulary: docs/repo-topics.md.  Full impact: docs/proposed-changes.md.
+#
+#   ./scripts/apply-topics.py            # validate + show the diff (writes nothing)
+#   ./scripts/apply-topics.py --apply    # write (requires confirmation)
+#
+# Per-repo invariants the script enforces:
+#   - exactly one work-type topic
+#   - exactly one status-* topic
+#   - status-inactive / status-archived must carry a last-active-YYYY
+#   - at most 20 topics (GitHub's limit)
+#
+# The script never removes a topic: the final list is the union of what the repo
+# already has and what is listed here. Deprecated spellings are therefore NOT
+# written out per repo below -- whatever is live is preserved automatically.
+#
+# Hardcoding them would be worse than redundant. While this proposal was being
+# drafted, `data-etl` and `etl` were cleaned up to `etl-pipeline` on two repos;
+# a manifest that still listed the old spellings would have resurrected them.
+
+# Spellings we would stop using on NEW repos. Not removed from repos that carry
+# them. Retiring any of these is a separate, later decision.
+deprecated:
+  etl: etl-pipeline
+  data-etl: etl-pipeline
+  survey: survey-research
+  template: repo-template
+  data-engineering: data-delivery
+  javascript: null          # GitHub derives languages from file contents
+
+# The vocabulary, machine-readable. docs/repo-topics.md is the prose version;
+# apply-topics.py checks neither has a term the other lacks, so they can't drift.
+facets:
+  work-type:      # exactly one per repo -- what kind of work this is
+    [data-delivery, app-build, research-computing, research-support, training, internal-ops]
+  client:         # optional -- who it is for, orthogonal to work type
+    [faculty-project]
+  stack:          # optional -- what it runs on. Only terms earned by >=2 repos.
+    [aws, claude-code, docker, google-cloud, gpu, llm, qualtrics, redivis, sherlock, slurm, terraform, web-scraping, yens]
+  lifecycle:      # exactly one per repo
+    [status-active, status-maintained, status-inactive, status-archived,
+     status-experimental]
+  year:           # required with status-inactive / status-archived
+    [last-active-2023, last-active-2024, last-active-2025, last-active-2026]
+
+# Vendors are deliberately NOT topics. `q=pitchbook in:name` already finds
+# pitchbook-feed-ETL, and of all 75 repos exactly one has a data source
+# invisible in its name (gelfand_scientific-disciplines-datasets -> Web of
+# Science) -- one repo does not justify a 16-term facet. Put the vendor in the
+# repo name; see CONTRIBUTING.md.
+
+repos:
+
+  # ------------------------------------------------------------- data-delivery
+  # Vendor or external data acquired and delivered to researchers.
+  comscore-data-ETL: [data-delivery, status-active]
+  data-axle-reference-usa-ETL: [data-delivery, status-active]
+  data-etl-template: [data-delivery, status-maintained]
+  dnb-establishment-data-ETL: [data-delivery, status-active]
+  edgar-yens-mirror: [data-delivery, yens, status-active]
+  gcp-scraping-terraform:
+    [data-delivery, google-cloud, terraform, web-scraping, status-inactive, last-active-2025]
+  hackingresources: [data-delivery, web-scraping, status-experimental]
+  kpler-maritime-gcp-ETL: [data-delivery, google-cloud, terraform, status-active]
+  pitchbook-feed-ETL: [data-delivery, redivis, status-active]
+  preqin-data-ETL: [data-delivery, aws, status-active]
+  sensor-tower-data-etl: [data-delivery, sherlock, slurm, redivis, aws, status-active]
+  shosh_freightos_pipeline: [data-delivery, faculty-project, status-active]
+  sp-451-research-datacenters-ETL: [data-delivery, status-active]
+  sp-panjiva-ETL: [data-delivery, status-active]
+  wos-starter-api-app: [data-delivery, status-maintained]
+
+  # ----------------------------------------------------------------- app-build
+  # Building or supporting an application, dashboard, or survey instrument.
+  behavior-lab-chatbot:
+    [app-build, faculty-project, llm, qualtrics, terraform, status-active]
+  gsb-qualtrics-ai-chatbot:
+    [app-build, llm, qualtrics, google-cloud, terraform, status-maintained]
+  monin-video-aws-delivery:
+    [app-build, faculty-project, aws, terraform, qualtrics, status-active]
+  monin-video-rating-survey: [app-build, faculty-project, qualtrics, status-active]
+  qualtrics-proxy: [app-build, qualtrics, status-experimental]
+  saml-fullstack-stanford: [app-build, terraform, aws, google-cloud, status-active]
+  wjnkim-llm-study:
+    [app-build, faculty-project, llm, google-cloud, docker, status-active]
+
+  # -------------------------------------------------------- research-computing
+  # The Yens and cluster: compute, GPUs, environments, platform docs.
+  claude-code-sandbox: [research-computing, docker, claude-code, status-experimental]
+  gsb-yen: [research-computing, yens, status-active]
+  LLM_benchmarks: [research-computing, llm, status-active]
+  llm_inference: [research-computing, yens, gpu, llm, status-inactive, last-active-2024]
+  LLM_YEN_BENCHMARK: [research-computing, yens, gpu, llm, status-active]
+  multi-fixmask: [research-computing, yens, status-maintained]
+  ollama_helper:
+    [research-computing, yens, sherlock, gpu, llm, status-inactive, last-active-2025]
+  pubsubgpt_pipeline:
+    [research-computing, google-cloud, llm, status-inactive, last-active-2024]
+  Qlora_code: [research-computing, yens, llm, status-archived, last-active-2024]
+  rcpedia: [research-computing, yens, status-active]
+  slurm-viz: [research-computing, yens, slurm, status-active]
+  Vast_Scripts: [research-computing, yens, status-experimental]
+  vllm_helper: [research-computing, yens, sherlock, gpu, llm, status-maintained]
+  yen_cluster_skills: [research-computing, yens, slurm, claude-code, status-active]
+  yenbox: [research-computing, yens, docker, claude-code, status-experimental]
+  yens-gpu-demo: [research-computing, yens, gpu, status-inactive, last-active-2023]
+
+  # ---------------------------------------------------------- research-support
+  # Analysis or method code written for one specific research question.
+  City_council_meeting_parser: [research-support, faculty-project, llm, status-active]
+  gelfand_scientific-disciplines-datasets:
+    [research-support, faculty-project, status-active]
+  green-patents: [research-support, faculty-project, status-inactive, last-active-2024]
+  jungho_state-regulations: [research-support, faculty-project, llm, status-active]
+  paperrag: [research-support, llm, status-experimental]
+  recombinant-search:
+    [research-support, faculty-project, status-inactive, last-active-2025]
+  sam-and-guy-ad-transparency-center:
+    [research-support, faculty-project, web-scraping, status-inactive, last-active-2023]
+  Saumitra-FrenchOCR-Lemay: [research-support, faculty-project, llm, status-maintained]
+
+  # ------------------------------------------------------------------ training
+  # Courses, bootcamps, workshops, how-to content.
+  bay-area-smoke: [training, status-maintained]
+  claude-skill-github-for-research: [training, claude-code, status-active]
+  gsb-research-computing-ai-skills:
+    [training, yens, slurm, gpu, claude-code, status-active]
+  HHT_titantic: [training, status-maintained]
+  image_ai_HHT: [training, status-inactive, last-active-2024]
+  intermediate_yens_2024: [training, yens, status-inactive, last-active-2024]
+  intro_to_yens_2024: [training, yens, status-inactive, last-active-2024]
+  pearc26-workshop-cursor: [training, status-active]
+  pearc26_tutorial_ai_agents: [training, claude-code, status-active]
+  reproducibility_HHT: [training, status-inactive, last-active-2024]
+  rf_bootcamp_2024: [training, status-inactive, last-active-2024]
+  rf_bootcamp_2025: [training, status-inactive, last-active-2025]
+  sf311: [training, status-maintained]
+  sklearn-pipeline: [training, status-inactive, last-active-2023]
+  yens-onboarding-2025: [training, yens, status-inactive, last-active-2025]
+  yens-onboarding-2026: [training, yens, slurm, claude-code, status-active]
+
+  # -------------------------------------------------------------- internal-ops
+  # DARC's own workflow and operations tooling.
+  .github: [internal-ops, status-active]
+  claude-code-best-practices: [internal-ops, claude-code, status-active]
+  claude-skills-project-summary: [internal-ops, claude-code, status-active]
+  darc-orchestrator: [internal-ops, claude-code, status-active]
+  darc-staff-skills: [internal-ops, yens, claude-code, status-active]
+  github-slack-connector: [internal-ops, status-active]
+  gsb-publications-explorer: [internal-ops, status-active]
+  promptops: [internal-ops, llm, status-inactive, last-active-2024]
+  softball-lineup-maker: [internal-ops, status-archived, last-active-2026]
+  Structured_output_blog-test-: [internal-ops, llm, status-experimental]
+  test-agent: [internal-ops, status-archived, last-active-2026]
+  tokenviz: [internal-ops, llm, status-active]
+  welcome-email: [internal-ops, yens, status-maintained]

@@ -15,7 +15,9 @@ This organization shares research computing tools, tutorials, and examples devel
 
 - **[Ollama helper](https://github.com/gsbdarc/ollama_helper)** — run Ollama on Stanford computing clusters.
 - **[vLLM helper](https://github.com/gsbdarc/vllm_helper)** — run vLLM on Stanford computing clusters.
-- **[Slurm visualization](https://github.com/gsbdarc/slurm-viz)** — visualize usage on the Yen Slurm cluster.
+- **[Qualtrics AI chatbot](https://github.com/gsbdarc/gsb-qualtrics-ai-chatbot)** — an AI chatbot embedded in a Qualtrics survey, deployed with Terraform.
+- **[Stanford SAML full-stack starter](https://github.com/gsbdarc/saml-fullstack-stanford)** — a Stanford-authenticated Next.js + FastAPI app behind a Shibboleth SP.
+- **[Bay Area smoke](https://github.com/gsbdarc/bay-area-smoke)** — seasonal wildfire-smoke risk built from EPA, NOAA and Stanford ECHOLab data.
 
 ## Get in touch
 
