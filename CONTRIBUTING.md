@@ -12,7 +12,8 @@
 - [ ] **Name it to the convention below.**
 - [ ] **Add topics** from [`docs/repo-topics.md`](docs/repo-topics.md) — three
       required, 30 seconds: exactly one **work type**, exactly one **`status-*`**,
-      and `faculty-project` if it's for a named PI. Add stack tags if they help.
+      and `faculty-project` if it's for a named PI. Add stack tags if they help —
+      `etl-pipeline` if it is one, wherever it sits.
 - [ ] **Add a README** covering what it is, how to set it up, and how to
       reproduce the results.
 - [ ] **Add a `.gitignore` before the first commit**, including `.env`.

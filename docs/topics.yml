@@ -12,23 +12,28 @@
 #   - status-inactive / status-archived must carry a last-active-YYYY
 #   - at most 20 topics (GitHub's limit)
 #
-# The script never removes a topic: the final list is the union of what the repo
-# already has and what is listed here. Deprecated spellings are therefore NOT
-# written out per repo below -- whatever is live is preserved automatically.
+# The final list per repo is:  (what the repo already has | what is listed here)
+# minus `remove:` below. So the only topics ever deleted are the ones explicitly
+# enumerated -- absence from this file is NOT a delete signal.
 #
-# Hardcoding them would be worse than redundant. While this proposal was being
-# drafted, `data-etl` and `etl` were cleaned up to `etl-pipeline` on two repos;
-# a manifest that still listed the old spellings would have resurrected them.
+# That distinction is deliberate. Dropping vendor tags and artifact types from
+# the *vocabulary* is a decision about what to tag going forward; it must not
+# silently become "delete the ones already there". Under an authoritative script
+# this file would wipe 32 tags across 11 repos, of which only 13 are actually
+# deprecated -- the other 19 are vendor tags and `etl-pipeline` that were set
+# deliberately. Enumerating removals keeps each deletion a decision somebody
+# wrote down, and leaves hand-tagging in the GitHub UI working.
 
-# Spellings we would stop using on NEW repos. Not removed from repos that carry
-# them. Retiring any of these is a separate, later decision.
-deprecated:
-  etl: etl-pipeline
-  data-etl: etl-pipeline
-  survey: survey-research
-  template: repo-template
-  data-engineering: data-delivery
-  javascript: null          # GitHub derives languages from file contents
+# Topics to DELETE wherever they appear. Each is a duplicate spelling or a term
+# GitHub already derives. Counts are repos affected as of this proposal.
+remove:
+  data-engineering: data-delivery      # 10 repos -- couldn't tell a school-wide
+                                       # asset from one PI's pipeline
+  survey: survey-research              #  1 repo
+  template: repo-template              #  1 repo
+  javascript: null                     #  1 repo -- GitHub derives languages
+  etl: etl-pipeline                    #  0 repos -- already cleaned up; listed
+  data-etl: etl-pipeline               #  0 repos    to block reintroduction
 
 # The vocabulary, machine-readable. docs/repo-topics.md is the prose version;
 # apply-topics.py checks neither has a term the other lacks, so they can't drift.
@@ -37,8 +42,9 @@ facets:
     [data-delivery, app-build, research-computing, research-support, training, internal-ops]
   client:         # optional -- who it is for, orthogonal to work type
     [faculty-project]
-  stack:          # optional -- what it runs on. Only terms earned by >=2 repos.
-    [aws, claude-code, docker, google-cloud, gpu, llm, qualtrics, redivis, sherlock, slurm, terraform, web-scraping, yens]
+  stack:          # optional -- what it runs on, or what shape it is.
+                  # Only terms earned by >=2 repos.
+    [etl-pipeline, aws, claude-code, docker, google-cloud, gpu, llm, qualtrics, redivis, sherlock, slurm, terraform, web-scraping, yens]
   lifecycle:      # exactly one per repo
     [status-active, status-maintained, status-inactive, status-archived,
      status-experimental]
@@ -55,21 +61,21 @@ repos:
 
   # ------------------------------------------------------------- data-delivery
   # Vendor or external data acquired and delivered to researchers.
-  comscore-data-ETL: [data-delivery, status-active]
-  data-axle-reference-usa-ETL: [data-delivery, status-active]
-  data-etl-template: [data-delivery, status-maintained]
-  dnb-establishment-data-ETL: [data-delivery, status-active]
-  edgar-yens-mirror: [data-delivery, yens, status-active]
+  comscore-data-ETL: [data-delivery, etl-pipeline, status-active]
+  data-axle-reference-usa-ETL: [data-delivery, etl-pipeline, status-active]
+  data-etl-template: [data-delivery, etl-pipeline, status-maintained]
+  dnb-establishment-data-ETL: [data-delivery, etl-pipeline, status-active]
+  edgar-yens-mirror: [data-delivery, etl-pipeline, yens, status-active]
   gcp-scraping-terraform:
-    [data-delivery, google-cloud, terraform, web-scraping, status-inactive, last-active-2025]
+    [data-delivery, etl-pipeline, google-cloud, terraform, web-scraping, status-inactive, last-active-2025]
   hackingresources: [data-delivery, web-scraping, status-experimental]
-  kpler-maritime-gcp-ETL: [data-delivery, google-cloud, terraform, status-active]
-  pitchbook-feed-ETL: [data-delivery, redivis, status-active]
-  preqin-data-ETL: [data-delivery, aws, status-active]
-  sensor-tower-data-etl: [data-delivery, sherlock, slurm, redivis, aws, status-active]
-  shosh_freightos_pipeline: [data-delivery, faculty-project, status-active]
-  sp-451-research-datacenters-ETL: [data-delivery, status-active]
-  sp-panjiva-ETL: [data-delivery, status-active]
+  kpler-maritime-gcp-ETL: [data-delivery, etl-pipeline, google-cloud, terraform, status-active]
+  pitchbook-feed-ETL: [data-delivery, etl-pipeline, redivis, status-active]
+  preqin-data-ETL: [data-delivery, etl-pipeline, aws, status-active]
+  sensor-tower-data-etl: [data-delivery, etl-pipeline, sherlock, slurm, redivis, aws, status-active]
+  shosh_freightos_pipeline: [data-delivery, etl-pipeline, faculty-project, status-active]
+  sp-451-research-datacenters-ETL: [data-delivery, etl-pipeline, status-active]
+  sp-panjiva-ETL: [data-delivery, etl-pipeline, status-active]
   wos-starter-api-app: [data-delivery, status-maintained]
 
   # ----------------------------------------------------------------- app-build
@@ -97,7 +103,7 @@ repos:
   ollama_helper:
     [research-computing, yens, sherlock, gpu, llm, status-inactive, last-active-2025]
   pubsubgpt_pipeline:
-    [research-computing, google-cloud, llm, status-inactive, last-active-2024]
+    [research-computing, etl-pipeline, google-cloud, llm, status-inactive, last-active-2024]
   Qlora_code: [research-computing, yens, llm, status-archived, last-active-2024]
   rcpedia: [research-computing, yens, status-active]
   slurm-viz: [research-computing, yens, slurm, status-active]
@@ -113,7 +119,7 @@ repos:
   gelfand_scientific-disciplines-datasets:
     [research-support, faculty-project, status-active]
   green-patents: [research-support, faculty-project, status-inactive, last-active-2024]
-  jungho_state-regulations: [research-support, faculty-project, llm, status-active]
+  jungho_state-regulations: [research-support, etl-pipeline, faculty-project, llm, status-active]
   paperrag: [research-support, llm, status-experimental]
   recombinant-search:
     [research-support, faculty-project, status-inactive, last-active-2025]

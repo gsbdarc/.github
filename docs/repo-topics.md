@@ -80,9 +80,14 @@ me every app we've built" silently omits four of them.
 What it runs on. **Every term here is earned by at least two repos** — a tag on
 one repo is a note, not a facet, and belongs in the description.
 
-`yens` (21) · `llm` (17) · `claude-code` (11) · `gpu` (6) · `google-cloud` (6) ·
-`terraform` (6) · `qualtrics` (5) · `slurm` (5) · `aws` (4) · `sherlock` (3) ·
-`docker` (3) · `web-scraping` (3) · `redivis` (2)
+`yens` (21) · `llm` (17) · `etl-pipeline` (15) · `claude-code` (11) · `gpu` (6) ·
+`google-cloud` (6) · `terraform` (6) · `qualtrics` (5) · `slurm` (5) · `aws` (4) ·
+`sherlock` (3) · `docker` (3) · `web-scraping` (3) · `redivis` (2)
+
+`etl-pipeline` earns its place because it carries what work type can't:
+`jungho_state-regulations` is `research-support` but *is* a pipeline, and
+`pubsubgpt_pipeline` is `research-computing` but is one too. It spans three work
+types across 15 repos.
 
 Spellings follow GitHub's community-standard names where one exists
 (`google-cloud`, not `gcp`).
@@ -140,23 +145,32 @@ paperrag                  research-support  llm                      status-expe
 
 Four to six topics each. GitHub's limit is 20.
 
-## Deprecated spellings (left in place, not removed)
+## Topics that get removed
 
-We would stop using these on **new** repos. They are **not** removed from repos
-that carry them — the proposal is strictly additive and
-[`apply-topics.py`](../scripts/apply-topics.py) never deletes a topic.
+Six terms are deleted wherever they appear — each is a duplicate spelling or
+something GitHub already derives:
 
-| Deprecated | Prefer | On repos today |
+| Removed | Replaced by | Repos affected |
 |---|---|---|
 | `data-engineering` | `data-delivery` | 10 |
-| `etl` / `data-etl` | `etl-pipeline`, or nothing — implied by `data-delivery` | 0 (already cleaned up) |
 | `survey` | `survey-research` | 1 |
 | `template` | `repo-template` | 1 |
 | `javascript` | *(nothing — GitHub derives languages)* | 1 |
+| `etl` / `data-etl` | `etl-pipeline` | 0 (already cleaned up; listed to block reintroduction) |
 
-This costs nothing in findability: because the canonical term is **added**
-everywhere it belongs, filtering works whether or not an old alias sits next to
-it. Actually retiring any of them is a separate, later decision.
+**13 deletions across 12 repos, and nothing else.** Removals are *enumerated*,
+not inferred: absence from `topics.yml` is deliberately **not** a delete signal.
+
+That distinction is the important one. Dropping vendors and artifact types from
+the vocabulary is a decision about what to tag *going forward*. If absence became
+the delete signal, it would silently also mean "delete the ones already there" —
+which would wipe 32 tags across 11 repos, of which only 13 are actually
+deprecated. The other 19 are the vendor tags and `etl-pipeline`, all set
+deliberately.
+
+Enumerating removals keeps every deletion something a person wrote down, and
+means tagging a repo by hand in the GitHub UI still works — an authoritative
+manifest would revert it on the next run.
 
 ## Open questions for review
 

@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Validate docs/topics.yml and apply it to the gsbdarc org.
 
-Writes nothing unless --apply is passed. Strictly additive: a topic already on a
-repo is never removed, so deprecated spellings are left exactly as they are.
+Writes nothing unless --apply is passed.
+
+Final topics per repo = (what the repo already has | what topics.yml lists)
+minus the enumerated `remove:` list. Absence from topics.yml is NOT a delete
+signal -- only terms explicitly listed under `remove:` are ever deleted.
 
     ./scripts/apply-topics.py              # validate + show the diff
     ./scripts/apply-topics.py --check      # validate only, exit 1 on any problem
@@ -86,9 +89,14 @@ def validate(manifest, org_topics):
         if dupes:
             problems.append(f"{name}: duplicate topics {sorted(dupes)}")
 
-        unknown = [t for t in topics if t not in vocab and t not in manifest["deprecated"]]
+        unknown = [t for t in topics if t not in vocab]
         if unknown:
             problems.append(f"{name}: undefined topics {sorted(unknown)} -- add them to facets: and to {DOC.name}")
+
+        # a term cannot be both proposed and slated for deletion
+        contradictory = [t for t in topics if t in manifest["remove"]]
+        if contradictory:
+            problems.append(f"{name}: proposes {sorted(contradictory)}, which remove: deletes")
 
         by_facet = {}
         for t in topics:
@@ -111,7 +119,7 @@ def validate(manifest, org_topics):
             problems.append(f"{name}: {sorted(years)} only belongs on status-inactive / status-archived")
 
         # additive merge is what actually lands -- check the limit against that
-        final = set(topics) | set(org_topics.get(name, []))
+        final = (set(topics) | set(org_topics.get(name, []))) - set(manifest["remove"])
         if len(final) > GITHUB_MAX_TOPICS:
             problems.append(f"{name}: would end up with {len(final)} topics, over GitHub's limit of {GITHUB_MAX_TOPICS}")
 
@@ -124,14 +132,18 @@ def validate(manifest, org_topics):
 
 
 def plan(manifest, org_topics):
-    """Additive merge. Returns [(repo, current, final, added)] for repos that change."""
+    """Merge, then subtract the enumerated removals.
+
+    Returns [(repo, current, final, added, removed)] for repos that change."""
+    remove = set(manifest["remove"])
     changes = []
     for name, proposed in sorted(manifest["repos"].items(), key=lambda kv: kv[0].lower()):
         current = set(org_topics.get(name, []))
-        final = current | set(proposed)
+        final = (current | set(proposed)) - remove
         added = sorted(final - current)
-        if added:
-            changes.append((name, sorted(current), sorted(final), added))
+        removed = sorted(current - final)
+        if added or removed:
+            changes.append((name, sorted(current), sorted(final), added, removed))
     return changes
 
 
@@ -169,17 +181,22 @@ def main():
         return
 
     changes = plan(manifest, org_topics)
-    for name, current, final, added in changes:
+    for name, current, final, added, removed in changes:
         print(f"\n{name}")
         for t in current:
-            note = "  (deprecated, kept)" if t in manifest["deprecated"] else ""
-            print(f"    = {t}{note}")
+            if t not in removed:
+                print(f"    = {t}")
         for t in added:
             print(f"    + {t}")
+        for t in removed:
+            repl = manifest["remove"].get(t)
+            why = f"-> {repl}" if repl else "(GitHub derives languages)"
+            print(f"    - {t}  {why}")
 
+    n_removals = sum(len(c[4]) for c in changes)
     n_noop = len(manifest["repos"]) - len(changes)
-    print(f"\n{len(changes)} repos would gain topics, {n_noop} unchanged. "
-          f"No topic is ever removed.")
+    print(f"\n{len(changes)} repos change, {n_noop} unchanged. "
+          f"{n_removals} topic(s) deleted, all from the enumerated remove: list.")
 
     if not args.apply:
         print("\nDry run -- nothing was written. Re-run with --apply to write.")
@@ -189,7 +206,7 @@ def main():
         raise SystemExit("Aborted; nothing written.")
 
     failed = []
-    for name, _current, final, _added in changes:
+    for name, _current, final, _added, _removed in changes:
         cmd = ["gh", "api", "-X", "PUT", f"/repos/{ORG}/{name}/topics"]
         for t in final:
             cmd += ["-f", f"names[]={t}"]

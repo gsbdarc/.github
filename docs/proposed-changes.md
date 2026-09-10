@@ -4,12 +4,13 @@
 > `./scripts/apply-topics.py` (dry run) against the org as it stands, so the
 > whole impact is reviewable without running anything.
 >
-> The proposal is **strictly additive** — no repo loses a topic. Deprecated
-> spellings still present (`data-engineering`, `survey`, `template`,
-> `javascript`) are marked `(deprecated, kept)` and left in place.
+> Removals are **enumerated, not inferred** — only the six terms under `remove:`
+> in `topics.yml` are ever deleted (13 deletions across 12 repos). Vendor tags
+> and `etl-pipeline` are untouched. Absence from the manifest is not a delete
+> signal.
 
 ```
-validation passed: 75 repos, 29 vocabulary terms
+validation passed: 75 repos, 30 vocabulary terms
 
 .github
     + internal-ops
@@ -56,10 +57,10 @@ claude-skills-project-summary
 
 comscore-data-ETL
     = comscore
-    = data-engineering  (deprecated, kept)
     = etl-pipeline
     + data-delivery
     + status-active
+    - data-engineering  -> data-delivery
 
 darc-orchestrator
     + claude-code
@@ -74,32 +75,34 @@ darc-staff-skills
 
 data-axle-reference-usa-ETL
     = data-axle
-    = data-engineering  (deprecated, kept)
     = etl-pipeline
     + data-delivery
     + status-active
+    - data-engineering  -> data-delivery
 
 data-etl-template
-    = data-engineering  (deprecated, kept)
     = etl-pipeline
-    = template  (deprecated, kept)
     + data-delivery
     + status-maintained
+    - data-engineering  -> data-delivery
+    - template  -> repo-template
 
 dnb-establishment-data-ETL
-    = data-engineering  (deprecated, kept)
     = dun-and-bradstreet
     = etl-pipeline
     + data-delivery
     + status-active
+    - data-engineering  -> data-delivery
 
 edgar-yens-mirror
     + data-delivery
+    + etl-pipeline
     + status-active
     + yens
 
 gcp-scraping-terraform
     + data-delivery
+    + etl-pipeline
     + google-cloud
     + last-active-2025
     + status-inactive
@@ -173,19 +176,20 @@ intro_to_yens_2024
     + yens
 
 jungho_state-regulations
+    + etl-pipeline
     + faculty-project
     + llm
     + research-support
     + status-active
 
 kpler-maritime-gcp-ETL
-    = data-engineering  (deprecated, kept)
     = etl-pipeline
     = google-cloud
     = kpler
     = terraform
     + data-delivery
     + status-active
+    - data-engineering  -> data-delivery
 
 LLM_benchmarks
     + llm
@@ -217,11 +221,11 @@ monin-video-aws-delivery
 
 monin-video-rating-survey
     = faculty-project
-    = javascript  (deprecated, kept)
     = qualtrics
-    = survey  (deprecated, kept)
     + app-build
     + status-active
+    - javascript  (GitHub derives languages)
+    - survey  -> survey-research
 
 multi-fixmask
     + research-computing
@@ -252,16 +256,17 @@ pearc26_tutorial_ai_agents
     + training
 
 pitchbook-feed-ETL
-    = data-engineering  (deprecated, kept)
     = etl-pipeline
     = pitchbook
     + data-delivery
     + redivis
     + status-active
+    - data-engineering  -> data-delivery
 
 preqin-data-ETL
     + aws
     + data-delivery
+    + etl-pipeline
     + status-active
 
 promptops
@@ -271,6 +276,7 @@ promptops
     + status-inactive
 
 pubsubgpt_pipeline
+    + etl-pipeline
     + google-cloud
     + last-active-2024
     + llm
@@ -336,7 +342,6 @@ Saumitra-FrenchOCR-Lemay
     + status-maintained
 
 sensor-tower-data-etl
-    = data-engineering  (deprecated, kept)
     = etl-pipeline
     = sensor-tower
     + aws
@@ -345,18 +350,19 @@ sensor-tower-data-etl
     + sherlock
     + slurm
     + status-active
+    - data-engineering  -> data-delivery
 
 sf311
     + status-maintained
     + training
 
 shosh_freightos_pipeline
-    = data-engineering  (deprecated, kept)
     = etl-pipeline
     = freightos
     + data-delivery
     + faculty-project
     + status-active
+    - data-engineering  -> data-delivery
 
 sklearn-pipeline
     + last-active-2023
@@ -375,18 +381,18 @@ softball-lineup-maker
     + status-archived
 
 sp-451-research-datacenters-ETL
-    = data-engineering  (deprecated, kept)
     = etl-pipeline
     = sp-global
     + data-delivery
     + status-active
+    - data-engineering  -> data-delivery
 
 sp-panjiva-ETL
-    = data-engineering  (deprecated, kept)
     = etl-pipeline
     = sp-global
     + data-delivery
     + status-active
+    - data-engineering  -> data-delivery
 
 Structured_output_blog-test-
     + internal-ops
@@ -467,7 +473,7 @@ yens-onboarding-2026
     + training
     + yens
 
-75 repos would gain topics, 0 unchanged. No topic is ever removed.
+75 repos change, 0 unchanged. 13 topic(s) deleted, all from the enumerated remove: list.
 
 Dry run -- nothing was written. Re-run with --apply to write.
 ```
