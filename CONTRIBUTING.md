@@ -11,9 +11,9 @@
       invisible in any listing.
 - [ ] **Name it to the convention below.**
 - [ ] **Add topics** from [`docs/repo-topics.md`](docs/repo-topics.md) — three
-      required, 30 seconds: exactly one **work type**, exactly one **`status-*`**,
-      and `faculty-project` if it's for a named PI. Add stack tags if they help —
-      `etl-pipeline` if it is one, wherever it sits.
+      choices, about 30 seconds: exactly one **work type**, exactly one
+      **`status-*`**, and `faculty-project` if it's for a named PI. Add stack
+      tags if they help, including `etl-pipeline` if it is one.
 - [ ] **Add a README** covering what it is, how to set it up, and how to
       reproduce the results.
 - [ ] **Add a `.gitignore` before the first commit**, including `.env`.
@@ -36,8 +36,7 @@ Then match the pattern for the kind of work:
 | Kind of repo | Pattern | Follows it today |
 |---|---|---|
 | Data acquisition | `<vendor>-<dataset>-etl` | `sensor-tower-data-etl` |
-| Analysis for one PI | `<pi-lastname>-<topic>` | `green-patents` |
-| Faculty project | `<pi-lastname>-<topic>` | `monin-video-rating-survey` |
+| Work for one PI | `<pi-lastname>-<topic>` | `monin-video-rating-survey` |
 | Taught course | `<audience>-<kind>-<year>` | `yens-onboarding-2026` |
 | Tool or app | `<thing>-<kind>` | `slurm-viz`, `qualtrics-proxy` |
 

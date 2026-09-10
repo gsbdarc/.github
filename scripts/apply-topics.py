@@ -9,6 +9,7 @@ signal -- only terms explicitly listed under `remove:` are ever deleted.
 
     ./scripts/apply-topics.py              # validate + show the diff
     ./scripts/apply-topics.py --check      # validate only, exit 1 on any problem
+    ./scripts/apply-topics.py --render     # regenerate the tables in repo-topics.md
     ./scripts/apply-topics.py --apply      # write (asks for confirmation)
 
 Needs the `gh` CLI, authenticated with a token that can write repo metadata.
@@ -33,6 +34,75 @@ GITHUB_MAX_TOPICS = 20
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = ROOT / "docs" / "topics.yml"
 DOC = ROOT / "docs" / "repo-topics.md"
+
+
+BEGIN = "<!-- BEGIN GENERATED"
+END = "<!-- END GENERATED -->"
+
+
+def render(manifest, org_topics):
+    """Build the data-derived section of repo-topics.md from the manifest.
+
+    Every count in the doc comes from here rather than being typed by hand --
+    typed counts silently go stale the moment the manifest changes, which is
+    exactly what happened to five of them before this existed.
+    """
+    import collections
+    r, f, rem = manifest["repos"], manifest["facets"], manifest["remove"]
+    used = collections.Counter(t for v in r.values() for t in v)
+    n_terms = sum(len(v) for v in f.values())
+
+    L = ["## The proposal, in full", "",
+         f"*Generated from [`topics.yml`](topics.yml) -- {len(r)} repos, "
+         f"{n_terms} topics. Do not edit by hand; run "
+         "`scripts/apply-topics.py --render`.*", "",
+         "### The vocabulary", ""]
+
+    LABEL = {"work-type": "Work type (exactly one)", "client": "Client (optional)",
+             "stack": "Stack (optional)", "lifecycle": "Lifecycle (exactly one)",
+             "year": "Year (required if inactive/archived)"}
+    for facet, terms in f.items():
+        ordered = sorted(terms, key=lambda t: (-used[t], t))
+        L += [f"**{LABEL.get(facet, facet)}** — {len(terms)} "
+              f"term{'s' if len(terms) != 1 else ''}  ",
+              " · ".join(f"`{t}` ({used[t]})" for t in ordered), ""]
+
+    fac = [n for n, v in r.items() if "faculty-project" in v]
+    by = collections.Counter(r[n][0] for n in fac)
+    L += ["### `faculty-project` spans work types", "",
+          f"{len(fac)} repos carry it, which is why it is a separate facet:", "",
+          "```"]
+    for w, c in by.most_common():
+        L.append(f"topic:faculty-project topic:{w:<20} -> {c:2}")
+    L += ["```", "", "### Proposed topics per repo", ""]
+
+    for w in f["work-type"]:
+        names = sorted((n for n, v in r.items() if v[0] == w), key=str.lower)
+        L += [f"#### `{w}` — {len(names)} repos", "",
+              "| Repo | Other topics |", "|---|---|"]
+        for n in names:
+            rest = " ".join(f"`{t}`" for t in r[n][1:]) or "—"
+            L.append(f"| [`{n}`](https://github.com/{ORG}/{n}) | {rest} |")
+        L.append("")
+
+    L += ["### What changes on apply", ""]
+    changes = plan(manifest, org_topics)
+    n_add = sum(len(c[3]) for c in changes)
+    n_del = sum(len(c[4]) for c in changes)
+    dels = collections.Counter(t for c in changes for t in c[4])
+    L += [f"{len(changes)} of {len(r)} repos change: **{n_add} topics added, "
+          f"{n_del} deleted.** Every deletion is an enumerated `remove:` term "
+          f"-- nothing else is touched.", "",
+          "| Deleted | Use instead | Why | Repos |", "|---|---|---|---|"]
+    for t, c in dels.most_common():
+        spec = rem[t]
+        instead = spec.get("instead")
+        L.append(f"| `{t}` | {f'`{instead}`' if instead else '—'} | {spec['why']} | {c} |")
+    unused = [t for t in rem if not dels[t]]
+    if unused:
+        L += ["", "Also in `remove:` but not currently on any repo, listed to block "
+              "reintroduction: " + ", ".join(f"`{t}`" for t in sorted(unused)) + "."]
+    return "\n".join(L)
 
 
 def gh_json(*args):
@@ -72,6 +142,16 @@ def validate(manifest, org_topics):
     for term in sorted(vocab):
         if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,49}", term):
             problems.append(f"vocabulary: `{term}` is not a legal GitHub topic (lowercase, digits, hyphens; <=50 chars)")
+
+    # --- a removal's replacement must actually exist ---
+    # Otherwise the doc tells people to use a term the taxonomy doesn't define.
+    for old, spec in manifest["remove"].items():
+        if not isinstance(spec, dict) or "why" not in spec:
+            problems.append(f"remove: `{old}` needs a `why`")
+            continue
+        new = spec.get("instead")
+        if new is not None and new not in vocab:
+            problems.append(f"remove: `{old}` -> `{new}`, but `{new}` is not in the vocabulary")
 
     # --- the manifest must cover the org exactly ---
     proposed = manifest["repos"]
@@ -163,10 +243,28 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--apply", action="store_true", help="actually write topics (default is a dry run)")
     ap.add_argument("--check", action="store_true", help="validate only; exit 1 if anything is wrong")
+    ap.add_argument("--render", action="store_true", help="regenerate the tables in repo-topics.md")
     args = ap.parse_args()
 
     manifest = yaml.safe_load(MANIFEST.read_text())
     org_topics = fetch_org_topics()
+
+    # The doc's generated section must match the manifest, or the doc is lying.
+    doc = DOC.read_text()
+    i, j = doc.index(BEGIN), doc.index(END)
+    marker_end = doc.index("-->", i) + 3
+    want = render(manifest, org_topics)
+    have = doc[marker_end:j].strip()
+
+    if args.render:
+        DOC.write_text(doc[:marker_end] + "\n\n" + want + "\n\n" + doc[j:])
+        print(f"rendered the generated section of {DOC.name}")
+        return
+    if have != want:
+        raise SystemExit(
+            f"{DOC.name}'s generated section is out of date with topics.yml.\n"
+            f"Run: scripts/apply-topics.py --render")
+    print(f"{DOC.name} generated section matches topics.yml")
 
     problems = validate(manifest, org_topics)
     if problems:
@@ -189,9 +287,12 @@ def main():
         for t in added:
             print(f"    + {t}")
         for t in removed:
-            repl = manifest["remove"].get(t)
-            why = f"-> {repl}" if repl else "(GitHub derives languages)"
-            print(f"    - {t}  {why}")
+            spec = manifest["remove"][t]
+            instead = spec.get("instead")
+            spec = manifest["remove"][t]
+            instead = spec.get("instead")
+            note = f"-> {instead}" if instead else "(" + spec["why"] + ")"
+            print(f"    - {t}  {note}")
 
     n_removals = sum(len(c[4]) for c in changes)
     n_noop = len(manifest["repos"]) - len(changes)

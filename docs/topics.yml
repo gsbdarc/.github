@@ -1,10 +1,14 @@
 # PROPOSED topic assignment for every repository in the gsbdarc organization.
 #
 # STATUS: proposed, not adopted. Nothing here has been applied to any repo.
-# Vocabulary: docs/repo-topics.md.  Full impact: docs/proposed-changes.md.
+# docs/repo-topics.md is the proposal: the taxonomy, the per-repo table and
+# the apply summary. Its generated section is rendered from this file.
 #
 #   ./scripts/apply-topics.py            # validate + show the diff (writes nothing)
+#   ./scripts/apply-topics.py --render   # regenerate the tables in repo-topics.md
 #   ./scripts/apply-topics.py --apply    # write (requires confirmation)
+#
+# After editing this file, run --render. `--check` fails if you forget.
 #
 # Per-repo invariants the script enforces:
 #   - exactly one work-type topic
@@ -24,16 +28,27 @@
 # deliberately. Enumerating removals keeps each deletion a decision somebody
 # wrote down, and leaves hand-tagging in the GitHub UI working.
 
-# Topics to DELETE wherever they appear. Each is a duplicate spelling or a term
-# GitHub already derives. Counts are repos affected as of this proposal.
+# Topics to DELETE wherever they appear. `instead` must be a term the taxonomy
+# actually defines -- the validator refuses a replacement that doesn't exist,
+# because a doc that tells people to use an undefined term is worse than one
+# that says nothing. `why` is what the generated table prints.
 remove:
-  data-engineering: data-delivery      # 10 repos -- couldn't tell a school-wide
-                                       # asset from one PI's pipeline
-  survey: survey-research              #  1 repo
-  template: repo-template              #  1 repo
-  javascript: null                     #  1 repo -- GitHub derives languages
-  etl: etl-pipeline                    #  0 repos -- already cleaned up; listed
-  data-etl: etl-pipeline               #  0 repos    to block reintroduction
+  data-engineering:
+    instead: data-delivery
+    why: could not tell a school-wide data asset from one PI's pipeline
+  etl:
+    instead: etl-pipeline
+    why: duplicate spelling
+  data-etl:
+    instead: etl-pipeline
+    why: duplicate spelling
+  survey:
+    instead: qualtrics
+    why: every repo carrying it is a Qualtrics instrument, already tagged
+  javascript:
+    why: GitHub derives languages from file contents
+  template:
+    why: GitHub has its own template-repo flag, shown as a badge on the repo
 
 # The vocabulary, machine-readable. docs/repo-topics.md is the prose version;
 # apply-topics.py checks neither has a term the other lacks, so they can't drift.
