@@ -4,6 +4,9 @@
 > team to review and discuss. Nothing here is enforced yet, and no existing repo
 > has been changed to match it.
 
+New to how we label repos? [`docs/taxonomy.md`](docs/taxonomy.md) explains the
+scheme; [`docs/repo-topics.md`](docs/repo-topics.md) is the term reference.
+
 ## Starting a new repository
 
 - [ ] **Write a description.** One sentence saying what it is and, if it's for

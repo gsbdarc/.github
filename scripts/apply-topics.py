@@ -34,6 +34,7 @@ GITHUB_MAX_TOPICS = 20
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = ROOT / "docs" / "topics.yml"
 DOC = ROOT / "docs" / "repo-topics.md"
+GUIDE = ROOT / "docs" / "taxonomy.md"
 
 
 BEGIN = "<!-- BEGIN GENERATED"
@@ -159,6 +160,17 @@ def validate(manifest, org_topics):
         new = spec.get("instead")
         if new is not None and new not in vocab:
             problems.append(f"remove: `{old}` -> `{new}`, but `{new}` is not in the vocabulary")
+
+    # --- the explainer must describe the same facets as the manifest ---
+    # It is prose and carries no counts, so this is its one structural claim.
+    if GUIDE.exists():
+        headings = [h.strip().lower().replace(" ", "-") for h in
+                    re.findall(r"^### \d+\. (.+?) —", GUIDE.read_text(), re.M)]
+        expected = [f for f in facets if f != "year"]   # year is folded into lifecycle
+        if headings != expected:
+            problems.append(
+                f"{GUIDE.name} documents facets {headings}, "
+                f"but topics.yml defines {expected}")
 
     # --- no live topic may be unaccounted for ---
     # A tag that is neither in the vocabulary nor in remove: silently persists

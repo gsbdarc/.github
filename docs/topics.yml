@@ -1,8 +1,9 @@
 # PROPOSED topic assignment for every repository in the gsbdarc organization.
 #
 # STATUS: proposed, not adopted. Nothing here has been applied to any repo.
-# docs/repo-topics.md is the proposal: the taxonomy, the per-repo table and
-# the apply summary. Its generated section is rendered from this file.
+# docs/taxonomy.md    explains the scheme -- what a facet is and why these four.
+# docs/repo-topics.md is the reference: the terms, the per-repo table and the
+#                     apply summary. Its generated section renders from this file.
 #
 #   ./scripts/apply-topics.py            # validate + show the diff (writes nothing)
 #   ./scripts/apply-topics.py --render   # regenerate the tables in repo-topics.md

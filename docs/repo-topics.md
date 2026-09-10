@@ -1,9 +1,14 @@
 # Repository topics for gsbdarc
 
 > **Status: PROPOSED — nothing has been applied.** No repository's topics have
-> been changed. This document is the whole proposal: the taxonomy, and the
-> topics proposed for every repo. [`topics.yml`](topics.yml) is the same thing
-> machine-readable.
+> been changed.
+
+This is the **reference**: the exact terms, and the topics proposed for every
+repo. [`topics.yml`](topics.yml) is the same thing machine-readable.
+
+**New to this? Read [`taxonomy.md`](taxonomy.md) first** — it explains what a
+facet is, why the scheme is shaped this way, and how to tag a repo. This page
+assumes you already know that and just need the terms.
 
 Deliberately lean — a scheme nobody can remember is a scheme nobody applies.
 Tagging a new repo is **three choices, about 30 seconds**: one work type, one
