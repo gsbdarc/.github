@@ -34,7 +34,7 @@ The org has 75 repositories and no working way to browse them.
 |---|---|
 | **Work type** — what kind of work this is | exactly one, required |
 | **Client** — who it's for | optional |
-| **Stack** — what it runs on, or what shape it is | optional, any number |
+| **Stack** — what it runs on | optional, any number |
 | **Lifecycle** — is it alive? | exactly one, required |
 
 Only terms in this document are valid. A new term gets added here in the same
@@ -64,17 +64,11 @@ me every app we've built" silently omits the faculty ones.
 
 ### Facet 3 — Stack
 
-What it runs on, or what shape it is. **Every term is earned by at least two
-repos** — a tag on one repo is a note, not a facet, and belongs in the
+What it runs on. **Every term is earned by at least two repos** — a tag on one repo is a note, not a facet, and belongs in the
 description. Spellings follow GitHub's community-standard names where one exists
 (`google-cloud`, not `gcp`).
 
-`etl-pipeline` lives here rather than being folded into `data-delivery`, because
-it carries something work type can't: `jungho_state-regulations` is
-`research-support` but *is* a pipeline, and `pubsubgpt_pipeline` is
-`research-computing` but is one too.
-
-#### Two things deliberately not tagged
+#### Three things deliberately not tagged
 
 **Programming languages.** GitHub derives them from file contents and the org
 listing already has a native Language filter. Tagging `python` duplicates that
@@ -83,10 +77,24 @@ and goes stale.
 **Vendors and data sources.** The vendor belongs in the **repo name**.
 `q=pitchbook in:name` already finds `pitchbook-feed-ETL`, and across all 75 repos
 exactly *one* has a data source invisible in its name
-(`gelfand_scientific-disciplines-datasets` → Web of Science) — which is not worth
-a sixteen-term facet. Put Web of Science in that repo's description instead. The
+(`gelfand_scientific-disciplines-datasets` → Web of Science) — not worth a
+sixteen-term facet. Put Web of Science in that repo's description instead.
+
+The decisive argument is what the existing tags actually look like: **the vendor
+facet reached only 9 of the 15 data repos.** `preqin-data-ETL` and
+`edgar-yens-mirror` never got one despite having obvious vendors. A facet applied
+to some of its population is worse than none at all, because absence stops
+meaning anything — you can't tell "no Preqin data" from "nobody tagged it." So
+the nine existing vendor tags are removed rather than the facet completed. The
 naming convention in [`CONTRIBUTING.md`](../CONTRIBUTING.md) is what makes this
 hold for new repos.
+
+**Pipelines.** `etl-pipeline` was on 10 repos and is dropped: 13 of the 15 repos
+it would cover are already `data-delivery`, so it restates the work type. The two
+exceptions (`jungho_state-regulations`, `pubsubgpt_pipeline`) don't earn a term
+applied to 15 repos. If "which pipelines do we operate?" turns out to be a
+question worth asking, `topic:data-delivery` is the answer and reinstating this
+is one line — see open question 5.
 
 ### Facet 4 — Lifecycle
 
@@ -114,13 +122,17 @@ Removals are **enumerated, not inferred.** Absence from `topics.yml` is
 deliberately *not* a delete signal, and only the terms listed under `remove:`
 are ever deleted — see [the summary below](#what-changes-on-apply).
 
-That distinction is the load-bearing one. Dropping vendors and artifact types
-from the vocabulary is a decision about what to tag *going forward*. If absence
-became the delete signal it would silently also mean "delete the ones already
-there", taking the vendor tags and `etl-pipeline` with it — tags that were set
-deliberately. Enumerating removals keeps every deletion something a person wrote
-down, and means tagging a repo by hand in the GitHub UI still works, where an
-authoritative manifest would revert it on the next run.
+The list is long — it includes the nine vendor tags and `etl-pipeline` — but
+enumeration still matters, for what happens *next*. An authoritative manifest
+would silently wipe anything not listed in it, so a tag someone adds in the
+GitHub UI next month gets reverted on the following run with no trace.
+Enumerating removals keeps every deletion something a person wrote down and a
+reason they wrote next to it.
+
+The counterpart is a totality check: **every topic live in the org must be either
+in the vocabulary or in `remove:`.** Nothing is allowed to sit unaccounted for.
+That check is what surfaced the nine vendor tags in the first place — they were
+neither blessed nor slated for removal, so they would have persisted forever.
 
 ## Open questions for review
 
@@ -146,6 +158,13 @@ are `training` (worked-example analyses) rather than `research-support`;
 `training`; `hackingresources` is `data-delivery` rather than `internal-ops`;
 `paperrag` is `research-support` rather than `internal-ops`.
 
+**5. Was dropping `etl-pipeline` right?** It's the closest call here. It was on
+10 repos and is a well-recognised GitHub topic, and it does say something work
+type doesn't for two repos. Reinstating it means adding it to `facets: stack`,
+removing it from `remove:`, and re-rendering — about a one-line change either
+way, so it's cheap to reverse if "which pipelines do we run?" turns out to be a
+question people actually ask.
+
 ## GitHub's constraints
 
 - Topics allow **lowercase letters, numbers and hyphens only** — no colons, dots
@@ -162,7 +181,7 @@ are `training` (worked-example analyses) rather than `research-support`;
 
 ## The proposal, in full
 
-*Generated from [`topics.yml`](topics.yml) -- 75 repos, 30 topics. Do not edit by hand; run `scripts/apply-topics.py --render`.*
+*Generated from [`topics.yml`](topics.yml) -- 75 repos, 29 topics. Do not edit by hand; run `scripts/apply-topics.py --render`.*
 
 ### The vocabulary
 
@@ -172,8 +191,8 @@ are `training` (worked-example analyses) rather than `research-support`;
 **Client (optional)** — 1 term  
 `faculty-project` (12)
 
-**Stack (optional)** — 14 terms  
-`yens` (21) · `llm` (17) · `etl-pipeline` (15) · `claude-code` (11) · `google-cloud` (6) · `gpu` (6) · `terraform` (6) · `qualtrics` (5) · `slurm` (5) · `aws` (4) · `docker` (3) · `sherlock` (3) · `web-scraping` (3) · `redivis` (2)
+**Stack (optional)** — 13 terms  
+`yens` (21) · `llm` (17) · `claude-code` (11) · `google-cloud` (6) · `gpu` (6) · `terraform` (6) · `qualtrics` (5) · `slurm` (5) · `aws` (4) · `docker` (3) · `sherlock` (3) · `web-scraping` (3) · `redivis` (2)
 
 **Lifecycle (exactly one)** — 5 terms  
 `status-active` (38) · `status-inactive` (17) · `status-maintained` (10) · `status-experimental` (7) · `status-archived` (3)
@@ -197,20 +216,20 @@ topic:faculty-project topic:data-delivery        ->  1
 
 | Repo | Other topics |
 |---|---|
-| [`comscore-data-ETL`](https://github.com/gsbdarc/comscore-data-ETL) | `etl-pipeline` `status-active` |
-| [`data-axle-reference-usa-ETL`](https://github.com/gsbdarc/data-axle-reference-usa-ETL) | `etl-pipeline` `status-active` |
-| [`data-etl-template`](https://github.com/gsbdarc/data-etl-template) | `etl-pipeline` `status-maintained` |
-| [`dnb-establishment-data-ETL`](https://github.com/gsbdarc/dnb-establishment-data-ETL) | `etl-pipeline` `status-active` |
-| [`edgar-yens-mirror`](https://github.com/gsbdarc/edgar-yens-mirror) | `etl-pipeline` `yens` `status-active` |
-| [`gcp-scraping-terraform`](https://github.com/gsbdarc/gcp-scraping-terraform) | `etl-pipeline` `google-cloud` `terraform` `web-scraping` `status-inactive` `last-active-2025` |
+| [`comscore-data-ETL`](https://github.com/gsbdarc/comscore-data-ETL) | `status-active` |
+| [`data-axle-reference-usa-ETL`](https://github.com/gsbdarc/data-axle-reference-usa-ETL) | `status-active` |
+| [`data-etl-template`](https://github.com/gsbdarc/data-etl-template) | `status-maintained` |
+| [`dnb-establishment-data-ETL`](https://github.com/gsbdarc/dnb-establishment-data-ETL) | `status-active` |
+| [`edgar-yens-mirror`](https://github.com/gsbdarc/edgar-yens-mirror) | `yens` `status-active` |
+| [`gcp-scraping-terraform`](https://github.com/gsbdarc/gcp-scraping-terraform) | `google-cloud` `terraform` `web-scraping` `status-inactive` `last-active-2025` |
 | [`hackingresources`](https://github.com/gsbdarc/hackingresources) | `web-scraping` `status-experimental` |
-| [`kpler-maritime-gcp-ETL`](https://github.com/gsbdarc/kpler-maritime-gcp-ETL) | `etl-pipeline` `google-cloud` `terraform` `status-active` |
-| [`pitchbook-feed-ETL`](https://github.com/gsbdarc/pitchbook-feed-ETL) | `etl-pipeline` `redivis` `status-active` |
-| [`preqin-data-ETL`](https://github.com/gsbdarc/preqin-data-ETL) | `etl-pipeline` `aws` `status-active` |
-| [`sensor-tower-data-etl`](https://github.com/gsbdarc/sensor-tower-data-etl) | `etl-pipeline` `sherlock` `slurm` `redivis` `aws` `status-active` |
-| [`shosh_freightos_pipeline`](https://github.com/gsbdarc/shosh_freightos_pipeline) | `etl-pipeline` `faculty-project` `status-active` |
-| [`sp-451-research-datacenters-ETL`](https://github.com/gsbdarc/sp-451-research-datacenters-ETL) | `etl-pipeline` `status-active` |
-| [`sp-panjiva-ETL`](https://github.com/gsbdarc/sp-panjiva-ETL) | `etl-pipeline` `status-active` |
+| [`kpler-maritime-gcp-ETL`](https://github.com/gsbdarc/kpler-maritime-gcp-ETL) | `google-cloud` `terraform` `status-active` |
+| [`pitchbook-feed-ETL`](https://github.com/gsbdarc/pitchbook-feed-ETL) | `redivis` `status-active` |
+| [`preqin-data-ETL`](https://github.com/gsbdarc/preqin-data-ETL) | `aws` `status-active` |
+| [`sensor-tower-data-etl`](https://github.com/gsbdarc/sensor-tower-data-etl) | `sherlock` `slurm` `redivis` `aws` `status-active` |
+| [`shosh_freightos_pipeline`](https://github.com/gsbdarc/shosh_freightos_pipeline) | `faculty-project` `status-active` |
+| [`sp-451-research-datacenters-ETL`](https://github.com/gsbdarc/sp-451-research-datacenters-ETL) | `status-active` |
+| [`sp-panjiva-ETL`](https://github.com/gsbdarc/sp-panjiva-ETL) | `status-active` |
 | [`wos-starter-api-app`](https://github.com/gsbdarc/wos-starter-api-app) | `status-maintained` |
 
 #### `app-build` — 7 repos
@@ -236,7 +255,7 @@ topic:faculty-project topic:data-delivery        ->  1
 | [`LLM_YEN_BENCHMARK`](https://github.com/gsbdarc/LLM_YEN_BENCHMARK) | `yens` `gpu` `llm` `status-active` |
 | [`multi-fixmask`](https://github.com/gsbdarc/multi-fixmask) | `yens` `status-maintained` |
 | [`ollama_helper`](https://github.com/gsbdarc/ollama_helper) | `yens` `sherlock` `gpu` `llm` `status-inactive` `last-active-2025` |
-| [`pubsubgpt_pipeline`](https://github.com/gsbdarc/pubsubgpt_pipeline) | `etl-pipeline` `google-cloud` `llm` `status-inactive` `last-active-2024` |
+| [`pubsubgpt_pipeline`](https://github.com/gsbdarc/pubsubgpt_pipeline) | `google-cloud` `llm` `status-inactive` `last-active-2024` |
 | [`Qlora_code`](https://github.com/gsbdarc/Qlora_code) | `yens` `llm` `status-archived` `last-active-2024` |
 | [`rcpedia`](https://github.com/gsbdarc/rcpedia) | `yens` `status-active` |
 | [`slurm-viz`](https://github.com/gsbdarc/slurm-viz) | `yens` `slurm` `status-active` |
@@ -253,7 +272,7 @@ topic:faculty-project topic:data-delivery        ->  1
 | [`City_council_meeting_parser`](https://github.com/gsbdarc/City_council_meeting_parser) | `faculty-project` `llm` `status-active` |
 | [`gelfand_scientific-disciplines-datasets`](https://github.com/gsbdarc/gelfand_scientific-disciplines-datasets) | `faculty-project` `status-active` |
 | [`green-patents`](https://github.com/gsbdarc/green-patents) | `faculty-project` `status-inactive` `last-active-2024` |
-| [`jungho_state-regulations`](https://github.com/gsbdarc/jungho_state-regulations) | `etl-pipeline` `faculty-project` `llm` `status-active` |
+| [`jungho_state-regulations`](https://github.com/gsbdarc/jungho_state-regulations) | `faculty-project` `llm` `status-active` |
 | [`paperrag`](https://github.com/gsbdarc/paperrag) | `llm` `status-experimental` |
 | [`recombinant-search`](https://github.com/gsbdarc/recombinant-search) | `faculty-project` `status-inactive` `last-active-2025` |
 | [`sam-and-guy-ad-transparency-center`](https://github.com/gsbdarc/sam-and-guy-ad-transparency-center) | `faculty-project` `web-scraping` `status-inactive` `last-active-2023` |
@@ -300,14 +319,16 @@ topic:faculty-project topic:data-delivery        ->  1
 
 ### What changes on apply
 
-75 of 75 repos change: **270 topics added, 13 deleted.** Every deletion is an enumerated `remove:` term -- nothing else is touched.
+75 of 75 repos change: **265 topics added, 32 deleted.** Every deletion is an enumerated `remove:` term -- nothing else is touched.
 
-| Deleted | Use instead | Why | Repos |
+| Deleted | Use instead | Repos | Why |
 |---|---|---|---|
-| `data-engineering` | `data-delivery` | could not tell a school-wide data asset from one PI's pipeline | 10 |
-| `template` | — | GitHub has its own template-repo flag, shown as a badge on the repo | 1 |
-| `javascript` | — | GitHub derives languages from file contents | 1 |
-| `survey` | `qualtrics` | every repo carrying it is a Qualtrics instrument, already tagged | 1 |
+| `data-engineering` | `data-delivery` | 10 | could not tell a school-wide data asset from one PI's pipeline |
+| `etl-pipeline` | `data-delivery` | 10 | redundant -- 13 of the 15 repos carrying it are already `data-delivery` |
+| `sp-global` `comscore` `data-axle` `dun-and-bradstreet` `kpler` `pitchbook` `sensor-tower` `freightos` | — | 9 | the vendor belongs in the repo name; the facet reached only 9 of 15 data repos, so its absence meant nothing |
+| `template` | — | 1 | GitHub has its own template-repo flag, shown as a badge on the repo |
+| `javascript` | — | 1 | GitHub derives languages from file contents |
+| `survey` | `qualtrics` | 1 | every repo carrying it is a Qualtrics instrument, already tagged |
 
 Also in `remove:` but not currently on any repo, listed to block reintroduction: `data-etl`, `etl`.
 

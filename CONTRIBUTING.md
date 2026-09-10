@@ -13,7 +13,7 @@
 - [ ] **Add topics** from [`docs/repo-topics.md`](docs/repo-topics.md) — three
       choices, about 30 seconds: exactly one **work type**, exactly one
       **`status-*`**, and `faculty-project` if it's for a named PI. Add stack
-      tags if they help, including `etl-pipeline` if it is one.
+      tags if they help. Don't tag the vendor — that goes in the name.
 - [ ] **Add a README** covering what it is, how to set it up, and how to
       reproduce the results.
 - [ ] **Add a `.gitignore` before the first commit**, including `.env`.

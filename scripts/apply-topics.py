@@ -93,11 +93,17 @@ def render(manifest, org_topics):
     L += [f"{len(changes)} of {len(r)} repos change: **{n_add} topics added, "
           f"{n_del} deleted.** Every deletion is an enumerated `remove:` term "
           f"-- nothing else is touched.", "",
-          "| Deleted | Use instead | Why | Repos |", "|---|---|---|---|"]
+          "| Deleted | Use instead | Repos | Why |", "|---|---|---|---|"]
+    # group terms that share a reason, or the table repeats one paragraph 8 times
+    groups = {}
     for t, c in dels.most_common():
         spec = rem[t]
-        instead = spec.get("instead")
-        L.append(f"| `{t}` | {f'`{instead}`' if instead else '—'} | {spec['why']} | {c} |")
+        key = (spec.get("instead"), spec["why"])
+        groups.setdefault(key, []).append((t, c))
+    for (instead, why), terms in sorted(groups.items(), key=lambda kv: -sum(c for _, c in kv[1])):
+        names = " ".join(f"`{t}`" for t, _ in terms)
+        n = sum(c for _, c in terms)
+        L.append(f"| {names} | {f'`{instead}`' if instead else '—'} | {n} | {why} |")
     unused = [t for t in rem if not dels[t]]
     if unused:
         L += ["", "Also in `remove:` but not currently on any repo, listed to block "
@@ -127,6 +133,7 @@ def fetch_org_topics():
 
 def validate(manifest, org_topics):
     """Collect every problem rather than exiting on the first one."""
+    import collections
     problems = []
     facets = manifest["facets"]
     vocab = {t: f for f, terms in facets.items() for t in terms}
@@ -152,6 +159,18 @@ def validate(manifest, org_topics):
         new = spec.get("instead")
         if new is not None and new not in vocab:
             problems.append(f"remove: `{old}` -> `{new}`, but `{new}` is not in the vocabulary")
+
+    # --- no live topic may be unaccounted for ---
+    # A tag that is neither in the vocabulary nor in remove: silently persists
+    # forever. Forcing a decision is what makes the taxonomy total.
+    unmanaged = collections.Counter()
+    for name, current in org_topics.items():
+        for t in set(current) - set(vocab) - set(manifest["remove"]):
+            unmanaged[t] += 1
+    for t, c in sorted(unmanaged.items()):
+        problems.append(
+            f"unmanaged: `{t}` is live on {c} repo(s) but is neither in the "
+            f"vocabulary nor in remove: -- bless it or list it for removal")
 
     # --- the manifest must cover the org exactly ---
     proposed = manifest["repos"]
